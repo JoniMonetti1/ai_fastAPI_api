@@ -5,3 +5,5 @@ pymysql
 pydantic
 pydantic_settings
 python-dotenv
+passlib
+bcrypt
