@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from ..database import connection
-from ..models.schemas import UserBase, ShowUser, UserCreate
+from ..models.schemas import ShowUser, UserCreate, UserUpdate, ShowNote
 from ..repository import userRepository
 
 router = APIRouter(
@@ -25,3 +25,22 @@ def create_user(
         request: UserCreate,
         db: Session = Depends(connection.get_db)):
     return userRepository.create(request, db)
+
+@router.put("/{user_id}", response_model=UserUpdate, status_code=202)
+def update_user(
+        user_id: int,
+        request: UserUpdate,
+        db: Session = Depends(connection.get_db)):
+    return userRepository.update(user_id, request, db)
+
+@router.delete("/{user_id}", status_code=204)
+def delete_user(
+        user_id: int,
+        db: Session = Depends(connection.get_db)):
+    return userRepository.delete(user_id, db)
+
+@router.get("/{user_id}/notes", response_model=List[ShowNote])
+def get_user_notes_by_id(
+        user_id: int,
+        db: Session = Depends(connection.get_db)):
+    return userRepository.get_all_notes_by_user_id(user_id, db)
