@@ -27,7 +27,7 @@ class ShowUser(UserBase):
 class NoteBase(BaseModel):
     title: str
     content: str
-    summary: str
+    summary: Optional[str] = ""
     category: Optional[str] = None
 
 class NoteCreate(NoteBase):

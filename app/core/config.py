@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Smart Notes API"
 
     # AI Service Settings
-    AI_API_KEY: str
+    GITHUB_TOKEN: str
 
     class Config:
         env_file = ".env"
