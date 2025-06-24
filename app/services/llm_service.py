@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from azure.ai.inference import ChatCompletionsClient
+from azure.ai.inference.aio import ChatCompletionsClient
 from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
 
@@ -16,10 +16,10 @@ class LLMService:
             credential=AzureKeyCredential(self.token),
         )
 
-    def generate_response(self, system_prompt: str, user_prompt: str,
+    async def generate_response(self, system_prompt: str, user_prompt: str,
                          temperature: float = 0.7, top_p: float = 0.95,
                          max_tokens: int = 500) -> str:
-        response = self.client.complete(
+        response = await self.client.complete(
             messages=[
                 SystemMessage(system_prompt),
                 UserMessage(user_prompt)
@@ -31,3 +31,6 @@ class LLMService:
         )
 
         return response.choices[0].message.content.strip()
+
+    async def close(self):
+        await self.client.close()

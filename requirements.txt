@@ -8,3 +8,4 @@ python-dotenv
 passlib
 bcrypt
 azure-ai-inference
+aiohttp

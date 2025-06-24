@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from ..models import database, schemas
-from ..services.ai_functions import generate_summary, generate_category
+from ..services.ai_functions import generate_summary_and_category
 
 
 def get_all(db: Session):
@@ -16,17 +16,16 @@ def get_by_id(
         raise HTTPException(status_code=404, detail=f"Note with id: {note_id} not found")
     return note
 
-def create(
+async def create(
         request: schemas.NoteCreate,
         db: Session):
     summary = None
     category = None
     if request.content and len(request.content) > 100:
         try:
-            summary = generate_summary(request.content)
-            category = generate_category(request.content)
+            summary, category = await generate_summary_and_category(request.content)
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error generating summary: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
     new_note = database.Note(
         title=request.title,
         content=request.content,

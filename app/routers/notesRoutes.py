@@ -21,10 +21,10 @@ def get_note_by_id(
     return notesRepository.get_by_id(note_id, db)
 
 @router.post("/", response_model=NoteCreate, status_code=201)
-def create_note(
+async def create_note(
         request: NoteCreate,
         db: Session = Depends(connection.get_db)):
-    return notesRepository.create(request, db)
+    return await notesRepository.create(request, db)
 
 @router.put("/{note_id}", response_model=NoteUpdate, status_code=202)
 def update_note(
