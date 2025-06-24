@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from ..models import database, schemas
-from ..services.generate_summary import generate_summary
+from ..services.ai_functions import generate_summary, generate_category
 
 
 def get_all(db: Session):
@@ -20,15 +20,18 @@ def create(
         request: schemas.NoteCreate,
         db: Session):
     summary = None
+    category = None
     if request.content and len(request.content) > 100:
         try:
             summary = generate_summary(request.content)
+            category = generate_category(request.content)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error generating summary: {str(e)}")
     new_note = database.Note(
         title=request.title,
         content=request.content,
         summary=summary,
+        category=category,
         user_id=request.user_id,
     )
     db.add(new_note)

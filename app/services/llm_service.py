@@ -16,7 +16,7 @@ class LLMService:
             credential=AzureKeyCredential(self.token),
         )
 
-    def generate_summary(self, system_prompt: str, user_prompt: str,
+    def generate_response(self, system_prompt: str, user_prompt: str,
                          temperature: float = 0.7, top_p: float = 0.95,
                          max_tokens: int = 500) -> str:
         response = self.client.complete(
