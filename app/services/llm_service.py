@@ -9,7 +9,7 @@ load_dotenv()
 class LLMService:
     def __init__(self):
         self.endpoint = "https://models.github.ai/inference"
-        self.model = "deepseek/DeepSeek-V3-0324"
+        self.model = "meta/Llama-4-Scout-17B-16E-Instruct"
         self.token = os.environ["GITHUB_TOKEN"]
         self.client = ChatCompletionsClient(
             endpoint=self.endpoint,

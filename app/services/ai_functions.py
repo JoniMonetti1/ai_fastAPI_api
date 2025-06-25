@@ -64,3 +64,28 @@ async def generate_summary_and_category(content: str) -> tuple[str, str]:
     except Exception as e:
         print(f"Error generating summary and category: {e}")
         return "Error generating summary", "General"
+
+async def enhance_note_for_notion(content: str) -> str:
+    system_prompt = (
+        "You are a specialized note enhancement assistant that transforms raw notes into well-structured Notion-ready content. "
+        "Your expertise includes:\n"
+        "1. Preserving the original meaning while improving clarity and readability\n"
+        "2. Organizing information with appropriate Notion formatting elements\n"
+        "3. Adding proper heading hierarchy (H1, H2, H3) where appropriate\n"
+        "4. Converting bullet points into toggle lists when containing sub-items\n"
+        "5. Creating callout blocks for important information\n"
+        "6. Adding tables for structured data when appropriate\n"
+        "7. Suggesting tags/properties based on content\n"
+        "8. Breaking walls of text into scannable sections\n\n"
+        "Maintain the user's original intent and voice while enhancing structure and readability. "
+        "Focus on creating a note that is both well-organized and visually appealing in Notion."
+    )
+
+    user_prompt = f"Enhance and structure the following note for Notion, maintaining its original meaning but improving organization and readability:\n\n{content}"
+
+    llm_service = await get_llm_service()
+    try:
+        return await llm_service.generate_response(system_prompt, user_prompt, max_tokens=1000)
+    except Exception as e:
+        print(f"Enhance failed: {e}")
+        return content

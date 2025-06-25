@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from ..models import database, schemas
-from ..services.ai_functions import generate_summary_and_category
+from ..services.ai_functions import generate_summary_and_category, enhance_note_for_notion
 
 
 def get_all(db: Session):
@@ -14,6 +14,26 @@ def get_by_id(
     note = db.query(database.Note).filter(database.Note.id == note_id).first()
     if not note:
         raise HTTPException(status_code=404, detail=f"Note with id: {note_id} not found")
+    return note
+
+async def enhance_by_id(
+        note_id: int,
+        db: Session):
+    note = db.query(database.Note).filter(database.Note.id == note_id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail=f"Note with id: {note_id} not found")
+
+    enhanced_content = None
+    if note.content and len(note.content) > 100:
+        try:
+            enhanced_content = await enhance_note_for_notion(note.content)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"AI enhancement failed: {str(e)}")
+
+    if enhanced_content:
+        note.content = enhanced_content
+        db.commit()
+        db.refresh(note)
     return note
 
 async def create(
