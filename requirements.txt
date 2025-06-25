@@ -9,3 +9,4 @@ passlib
 bcrypt
 azure-ai-inference
 aiohttp
+cryptography
