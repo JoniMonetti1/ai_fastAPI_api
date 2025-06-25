@@ -12,7 +12,7 @@ router = APIRouter(
 
 @router.get("/", response_model=List[ShowUser])
 def get_all_users(db: Session = Depends(connection.get_db)):
-    return userRepository.get_all(db);
+    return userRepository.get_all(db)
 
 @router.get("/{user_id}", response_model=ShowUser)
 def get_user_by_id(

@@ -26,6 +26,12 @@ async def enhance_note_by_id(
         db: Session = Depends(connection.get_db)):
     return await notesRepository.enhance_by_id(note_id, db)
 
+@router.get("/{note_id}/summary", response_model=ShowNote)
+async def generate_summary_by_id(
+        note_id: int,
+        db: Session = Depends(connection.get_db)):
+    return await notesRepository.generate_summary_by_id(note_id, db)
+
 @router.post("/", response_model=NoteCreate, status_code=201)
 async def create_note(
         request: NoteCreate,

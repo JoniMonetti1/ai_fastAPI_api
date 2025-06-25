@@ -16,54 +16,64 @@ async def cleanup_llm_service():
         await llm_service.close()
         llm_service = None
 
-async def generate_summary(content: str, max_length: int = 100) -> str:
+
+async def generate_summary(content: str, max_length: int = 150) -> str:
     system_prompt = (
         "You are a helpful assistant specialized in creating concise summaries. "
-        "Focus on the main points and key information."
+        "Focus on the main points and key information from the content. "
+        "The content may include Notion-specific formatting such as headings, toggle lists, "
+        "callout blocks, tables, and other structured elements. "
+        "Extract the essential information while preserving the original meaning, "
+        "regardless of the formatting structure."
     )
-    user_prompt = f"Create a concise summary (maximum {max_length} characters) of the following text:\n\n{content}"
+    user_prompt = f"Create a concise summary (maximum {max_length} characters) of the following text which may contain Notion formatting:\n\n{content}"
 
     llm_service = await get_llm_service()
     try:
-        return await llm_service.generate_response(system_prompt, user_prompt, max_tokens=150)
+        return await llm_service.generate_response(system_prompt, user_prompt, max_tokens=200)
     except Exception as e:
         print(f"Summary generation failed: {e}")
         return "Summary generation failed"
 
-
-async def generate_category(content: str, max_length: int = 50) -> str:
+async def generate_title_and_category(content: str, max_length: int = 50) -> tuple[str, str]:
     system_prompt = (
-        "You are a helpful assistant specialized in categorizing content. "
-        "Choose from common categories like: Work, Personal, Study, Ideas, Tasks, "
+        "You are a helpful assistant specialized in generating titles and categorizing content. "
+        "For titles: Create a concise, descriptive title that captures the essence of the content. "
+        "For categories: Choose from common categories like: Work, Personal, Study, Ideas, Tasks, "
         "Meeting Notes, Research, or create a relevant single-word category."
+        "Your response should be strictly formatted as: \n1. Title:\n2. Category:"
     )
-    user_prompt = f"Categorize the following content into a single category (maximum {max_length} characters):\n\n{content}"
+    user_prompt = f"For the following content:\n\n{content}\n\nProvide:\n1. A concise title (max {max_length} characters)\n2. A single category word or phrase"
 
     llm_service = await get_llm_service()
     try:
-        return await llm_service.generate_response(system_prompt, user_prompt, max_tokens=50)
+        response = await llm_service.generate_response(system_prompt, user_prompt, max_tokens=100)
+        parts = response.split("\n")
+        title = parts[0].replace("1. Title:", "").strip() if len(parts) > 0 else "Untitled"
+        category = parts[1].replace("2. Category:", "").strip() if len(parts) > 1 else "General"
+        return title, category
     except Exception as e:
-        print(f"Category generation failed: {e}")
-        return "General"
+        print(f"Title and category generation failed: {e}")
+        return "Untitled", "General"
 
 
-async def generate_summary_and_category(content: str) -> tuple[str, str]:
-    if not content or len(content.strip()) < 10:
-        return "Content too short for processing", "General"
-
-    try:
-        summary_task = generate_summary(content)
-        category_task = generate_category(content)
-
-        summary, category = await asyncio.gather(summary_task, category_task)
-
-        summary = summary[:500] if summary else "No summary available"
-        category = category[:50] if category else "General"
-
-        return summary, category
-    except Exception as e:
-        print(f"Error generating summary and category: {e}")
-        return "Error generating summary", "General"
+# async def generate_summary_and_category(content: str) -> tuple[str, str]:
+#     if not content or len(content.strip()) < 10:
+#         return "Content too short for processing", "General"
+#
+#     try:
+#         summary_task = generate_summary(content)
+#         category_task = generate_category(content)
+#
+#         summary, category = await asyncio.gather(summary_task, category_task)
+#
+#         summary = summary[:500] if summary else "No summary available"
+#         category = category[:50] if category else "General"
+#
+#         return summary, category
+#     except Exception as e:
+#         print(f"Error generating summary and category: {e}")
+#         return "Error generating summary", "General"
 
 async def enhance_note_for_notion(content: str) -> str:
     system_prompt = (
