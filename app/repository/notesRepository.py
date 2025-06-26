@@ -69,7 +69,6 @@ async def create(
     new_note = database.Note(
         title=title,
         content=request.content,
-        summary=request.summary,
         category=category,
         user_id=request.user_id,
     )

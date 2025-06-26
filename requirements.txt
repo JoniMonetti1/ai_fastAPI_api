@@ -10,3 +10,4 @@ bcrypt
 azure-ai-inference
 aiohttp
 cryptography
+pydantic[email]
