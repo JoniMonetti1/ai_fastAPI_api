@@ -41,7 +41,9 @@ async def generate_title_and_category(content: str, max_length: int = 50) -> tup
         "For titles: Create a concise, descriptive title that captures the essence of the content. "
         "For categories: Choose from common categories like: Work, Personal, Study, Ideas, Tasks, "
         "Meeting Notes, Research, or create a relevant single-word category."
-        "Your response should be strictly formatted as: \n1. Title:\n2. Category:"
+        "Your response should be strictly formatted ONLY as: \n1. Title:\n2. Category:\n\n"
+        "Example 1: \n1. Title: Project Update\n2. Category: Work\n"
+        "Example 2: \n1. Title: Grocery List\n2. Category: Personal\n"
     )
     user_prompt = f"For the following content:\n\n{content}\n\nProvide:\n1. A concise title (max {max_length} characters)\n2. A single category word or phrase"
 
@@ -89,13 +91,16 @@ async def enhance_note_for_notion(content: str) -> str:
         "8. Breaking walls of text into scannable sections\n\n"
         "Maintain the user's original intent and voice while enhancing structure and readability. "
         "Focus on creating a note that is both well-organized and visually appealing in Notion."
+        "Use actual line breaks, not \\n characters in your response."
     )
 
     user_prompt = f"Enhance and structure the following note for Notion, maintaining its original meaning but improving organization and readability:\n\n{content}"
 
     llm_service = await get_llm_service()
     try:
-        return await llm_service.generate_response(system_prompt, user_prompt, max_tokens=1000)
+        response = await llm_service.generate_response(system_prompt, user_prompt, max_tokens=1000)
+        response = response.replace('\\n', '\n').replace('\\\\n', '\n')
+        return response
     except Exception as e:
         print(f"Enhance failed: {e}")
         return content

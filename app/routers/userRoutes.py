@@ -1,7 +1,10 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
+from ..auth.OAuth2 import get_current_user
 from ..database import connection
+from ..models import database
 from ..models.schemas import ShowUser, UserCreate, UserUpdate, ShowNote
 from ..repository import userRepository
 
@@ -11,13 +14,15 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[ShowUser])
-def get_all_users(db: Session = Depends(connection.get_db)):
+def get_all_users(db: Session = Depends(connection.get_db),
+        current_user: database.User = Depends(get_current_user)):
     return userRepository.get_all(db)
 
 @router.get("/{user_id}", response_model=ShowUser)
 def get_user_by_id(
         user_id: int,
-        db: Session = Depends(connection.get_db)):
+        db: Session = Depends(connection.get_db),
+        current_user: database.User = Depends(get_current_user)):
     return userRepository.get_by_id(user_id, db)
 
 @router.post("/", response_model=UserCreate, status_code=201)
@@ -30,17 +35,20 @@ def create_user(
 def update_user(
         user_id: int,
         request: UserUpdate,
-        db: Session = Depends(connection.get_db)):
+        db: Session = Depends(connection.get_db),
+        current_user: database.User = Depends(get_current_user)):
     return userRepository.update(user_id, request, db)
 
 @router.delete("/{user_id}", status_code=204)
 def delete_user(
         user_id: int,
-        db: Session = Depends(connection.get_db)):
+        db: Session = Depends(connection.get_db),
+        current_user: database.User = Depends(get_current_user)):
     return userRepository.delete(user_id, db)
 
 @router.get("/{user_id}/notes", response_model=List[ShowNote])
 def get_user_notes_by_id(
         user_id: int,
-        db: Session = Depends(connection.get_db)):
+        db: Session = Depends(connection.get_db),
+        current_user: database.User = Depends(get_current_user)):
     return userRepository.get_all_notes_by_user_id(user_id, db)

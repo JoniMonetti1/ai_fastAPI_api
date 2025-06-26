@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     # AI Service Settings
     GITHUB_TOKEN: str
 
+    # Authentication Settings
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

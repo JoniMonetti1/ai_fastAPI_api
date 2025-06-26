@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from .models import database
 from .database.connection import engine
-from .routers import userRoutes, notesRoutes
+from .routers import userRoutes, notesRoutes, auth
 from .services.ai_functions import cleanup_llm_service
 
 @asynccontextmanager
@@ -25,3 +25,4 @@ app = FastAPI(
 
 app.include_router(userRoutes.router)
 app.include_router(notesRoutes.router)
+app.include_router(auth.router)

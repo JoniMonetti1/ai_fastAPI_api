@@ -5,9 +5,10 @@ pymysql
 pydantic
 pydantic_settings
 python-dotenv
-passlib
 bcrypt
 azure-ai-inference
 aiohttp
-cryptography
 pydantic[email]
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
