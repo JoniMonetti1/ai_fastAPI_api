@@ -25,7 +25,7 @@ def get_note_by_id(
         current_user: database.User = Depends(get_current_user)):
     return notesRepository.get_by_id(note_id, db)
 
-@router.get("/{note_id}/enhance", response_model=ShowNote)
+@router.get("/{note_id}/enhance", response_model=str)
 async def enhance_note_by_id(
         note_id: int,
         db: Session = Depends(connection.get_db),

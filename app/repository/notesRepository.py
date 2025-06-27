@@ -34,7 +34,7 @@ async def enhance_by_id(
         note.content = enhanced_content
         db.commit()
         db.refresh(note)
-    return note
+    return enhanced_content
 
 async def generate_summary_by_id(
         note_id: int,
